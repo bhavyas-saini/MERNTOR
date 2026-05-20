@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd server && npm install && npm run build 2>/dev/null || true",
+  "startCommand": "cd server && npm start"
+}
