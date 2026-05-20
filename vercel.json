@@ -3,7 +3,11 @@
   "outputDirectory": "build",
   "routes": [
     {
-      "src": "/(?!api).*",
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/.*",
       "dest": "/index.html"
     }
   ]
