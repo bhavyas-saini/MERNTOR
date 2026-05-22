@@ -5,9 +5,13 @@ const mailSender = async (email, title, body) => {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY)
 
+    // For Resend free tier, only your verified email can receive emails
+    const recipientEmail = process.env.NODE_ENV === "production" ? 
+      "bhavyasaini93@gmail.com" : email
+
     const info = await resend.emails.send({
       from: "noreply@resend.dev",
-      to: email,
+      to: recipientEmail,
       subject: title,
       html: body,
     })
