@@ -27,11 +27,20 @@ exports.resetPasswordToken = async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
     const url = `${frontendUrl}/update-password/${token}`
 
-    await mailSender(
+    const emailResult = await mailSender(
       email,
       "Password Reset",
       `Your Link for email verification is ${url}. Please click this url to reset your password.`
     )
+    
+    // Check if email sending failed
+    if (emailResult && !emailResult.success) {
+      return res.json({
+        error: emailResult.error,
+        success: false,
+        message: `Some Error in Sending the Reset Message`,
+      })
+    }
 
     res.json({
       success: true,
@@ -39,8 +48,9 @@ exports.resetPasswordToken = async (req, res) => {
         "Email Sent Successfully, Please Check Your Email to Continue Further",
     })
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error)
     return res.json({
-      error: error.message,
+      error: errorMsg,
       success: false,
       message: `Some Error in Sending the Reset Message`,
     })

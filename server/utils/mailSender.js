@@ -12,15 +12,19 @@ const mailSender = async (email, title, body) => {
       html: body,
     })
     
-    if (info.error) {
-      throw new Error(info.error.message)
+    // Check if response has error
+    if (info && info.error) {
+      const errorMsg = typeof info.error === 'string' ? info.error : (info.error.message || JSON.stringify(info.error))
+      console.log("Resend API error:", errorMsg)
+      return { success: false, error: errorMsg }
     }
     
-    console.log("Email sent successfully:", info.data?.id)
-    return info
+    console.log("Email sent successfully:", info?.id)
+    return { success: true, data: info }
   } catch (error) {
-    console.log("Email error:", error.message)
-    throw error
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    console.log("MailSender error:", errorMsg)
+    throw new Error(errorMsg)
   }
 }
 
