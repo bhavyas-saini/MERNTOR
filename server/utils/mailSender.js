@@ -6,7 +6,7 @@ const mailSender = async (email, title, body) => {
     const resend = new Resend(process.env.RESEND_API_KEY)
 
     const info = await resend.emails.send({
-      from: "MERNTOR <onboarding@resend.dev>",
+      from: "noreply@resend.dev",
       to: email,
       subject: title,
       html: body,
