@@ -1,4 +1,10 @@
 // Importing necessary modules and packages
+// Set up fetch polyfill for Node.js (required for Resend)
+if (!globalThis.fetch) {
+  const { fetch } = require("undici");
+  globalThis.fetch = fetch;
+}
+
 require("dotenv").config();
 const express = require("express");
 const app = express();
