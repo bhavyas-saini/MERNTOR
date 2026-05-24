@@ -1,34 +1,52 @@
 const nodemailer = require("nodemailer")
-const { fetch } = require("undici")
+const https = require("https")
 require("dotenv").config()
 
 const mailSender = async (email, title, body) => {
   try {
     // Use Resend HTTP API if API key is present (Railway blocks SMTP)
     if (process.env.RESEND_API_KEY) {
-      const payload = {
+      const payload = JSON.stringify({
         from: process.env.SMTP_FROM_EMAIL || "noreply@merntor.ink",
         to: email,
         subject: title,
         html: body,
-      }
+      })
 
-      const res = await fetch("https://api.resend.com/emails", {
+      const options = {
+        hostname: "api.resend.com",
+        port: 443,
+        path: "/emails",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(payload),
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         },
-        body: JSON.stringify(payload),
-      })
-
-      const text = await res.text()
-      if (!res.ok) {
-        console.log("Resend API error:", text)
-        throw new Error(`Resend API responded with status ${res.status}`)
       }
 
-      const data = JSON.parse(text)
+      const data = await new Promise((resolve, reject) => {
+        const req = https.request(options, (res) => {
+          let raw = ""
+          res.setEncoding("utf8")
+          res.on("data", (chunk) => (raw += chunk))
+          res.on("end", () => {
+            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                return resolve(JSON.parse(raw))
+              } catch (e) {
+                return resolve(raw)
+              }
+            }
+            return reject(new Error(`Resend API responded with status ${res.statusCode}: ${raw}`))
+          })
+        })
+
+        req.on("error", (err) => reject(err))
+        req.write(payload)
+        req.end()
+      })
+
       console.log("Email sent via Resend:", data.id || data)
       return { success: true, data }
     }
