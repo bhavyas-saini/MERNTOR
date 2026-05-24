@@ -6,8 +6,10 @@ const mailSender = async (email, title, body) => {
   try {
     // Use Resend HTTP API if API key is present (Railway blocks SMTP)
     if (process.env.RESEND_API_KEY) {
+      const resendFrom = process.env.RESEND_FROM || process.env.SMTP_FROM_EMAIL || "noreply@merntor.ink"
+
       const payload = JSON.stringify({
-        from: process.env.SMTP_FROM_EMAIL || "noreply@merntor.ink",
+        from: resendFrom,
         to: email,
         subject: title,
         html: body,
