@@ -94,9 +94,7 @@ exports.createCourse = async (req, res) => {
 
     // Add the new course to the User Schema of the Instructor
     await User.findByIdAndUpdate(
-      {
-        _id: instructorDetails._id,
-      },
+      instructorDetails._id,
       {
         $push: {
           courses: newCourse._id,
@@ -106,7 +104,7 @@ exports.createCourse = async (req, res) => {
     )
     // Add the new course to the Categories
     const categoryDetails2 = await Category.findByIdAndUpdate(
-      { _id: category },
+      category,
       {
         $push: {
           courses: newCourse._id,
