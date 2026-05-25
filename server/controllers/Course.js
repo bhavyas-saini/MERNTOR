@@ -24,7 +24,7 @@ exports.createCourse = async (req, res) => {
       instructions: _instructions,
     } = req.body
     // Get thumbnail image from request files
-    const thumbnail = req.files.thumbnailImage
+    const thumbnail = req.files?.thumbnailImage
 
     // Convert the tag and instructions from stringified Array to Array
     const tag = JSON.parse(_tag)
@@ -46,7 +46,7 @@ exports.createCourse = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "All Fields are Mandatory",
+        message: "All Fields are Mandatory, including the course thumbnail",
       })
     }
     if (!status || status === undefined) {
